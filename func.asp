@@ -12,4 +12,5 @@ Sub show_table()
     Response.Write "</tr>"
   rs.MoveNext	' 移到下一筆
   Wend
+  Response.Write "</table>"
 End Sub
