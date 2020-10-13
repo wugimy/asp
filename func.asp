@@ -14,3 +14,8 @@ Sub show_table()
     Wend
     Response.Write "</table>"
 End Sub
+
+'轉日期時間格式
+Function FDT(DT)
+	FDT = FormatDateTime(DT,vbShortDate) & " " & FormatDateTime(DT,vbShortTime) & ":" & right("0" & Second(DT),2)
+End Function
