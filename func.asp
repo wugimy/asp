@@ -1,4 +1,6 @@
 Sub show_table()
+    set rs=server.createobject("adodb.Recordset")
+    rs.Open SQL,cnn
     Response.Write "<table><tr>"
     For i=0 to rs.Fields.Count-1
         Response.Write "<th>" & rs(i).Name & "</th>"
@@ -13,6 +15,8 @@ Sub show_table()
     rs.MoveNext	' 移到下一筆
     Wend
     Response.Write "</table>"
+    rs.Close
+    set rs = nothing
 End Sub
 
 '轉日期時間格式
