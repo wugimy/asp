@@ -1,3 +1,7 @@
+<form method="POST" action="<%=Request.ServerVariables("PATH_INFO")%>">
+<input type="submit" value="送出" name="B1">
+</form>
+
 <table>
 <%
 For i=0 to rs.Fields.Count-1
