@@ -8,9 +8,9 @@ Sub show_table()
     Response.Write "</tr>"
     While Not rs.EOF	' 判斷是否過了最後一筆
         Response.Write "<tr>"
-    For i = 0 to rs.Fields.Count-1
-        Response.Write "<TD>" & rs(i) & "</TD>"
-    Next
+    	For i = 0 to rs.Fields.Count-1
+            Response.Write "<TD>" & rs(i) & "</TD>"
+    	Next
     Response.Write "</tr>"
     rs.MoveNext	' 移到下一筆
     Wend
