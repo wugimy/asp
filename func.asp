@@ -23,3 +23,24 @@ End Sub
 Function FDT(DT)
 	FDT = FormatDateTime(DT,vbShortDate) & " " & FormatDateTime(DT,vbShortTime) & ":" & right("0" & Second(DT),2)
 End Function
+
+'=====取得cols & rows
+Sub get_data()
+set rs=server.createobject("adodb.Recordset")
+rs.Open SQL,cnn
+
+For i = 0 to rs.Fields.Count-1
+	If i > 0 Then cols = cols & ","
+	cols = cols & rs(i).Name	
+Next
+While Not rs.EOF
+	If rows <> "" Then rows = rows & ";"
+	For i = 0 to rs.Fields.Count-1
+		If i > 0 Then rows = rows & ","
+		rows = rows & rs(i)
+	Next
+rs.MoveNext	' 移到下一筆
+Wend
+rs.Close
+set rs = nothing
+End Sub
