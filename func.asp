@@ -44,3 +44,21 @@ Wend
 rs.Close
 set rs = nothing
 End Sub
+
+
+item_str = ""
+'====取得單一欄位的字串
+Sub get_item()
+	set rs=server.createobject("adodb.Recordset")
+	rs.Open SQL,cnn
+	If Not rs.EOF Then
+	item_str = rs(0)
+	rs.MoveNext
+	While Not rs.EOF
+		item_str = item_str & "," & rs(0)
+    rs.MoveNext
+    Wend
+	End If
+	rs.Close
+	set rs = nothing
+End Sub
