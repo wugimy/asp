@@ -62,3 +62,22 @@ Sub get_item()
 	rs.Close
 	set rs = nothing
 End Sub
+
+
+Function get_color(status)
+	color = "#CCFFFF"
+	If status = "RUN" Then
+		color = "#00FF00"
+	ElseIf status = "IDLE" Then
+		color = "#FFFF00"	
+	ElseIf status = "DOWN" Then
+		color = "#FF0000"
+	ElseIf status = "DMQC" Then
+		color = "#FF00FF"
+	ElseIf status = "PM" Then
+		color = "#00FFFF"
+	ElseIf status = "TEST" Then
+		color = "#CCFFFF"
+	End If
+	get_color = color
+End Function
