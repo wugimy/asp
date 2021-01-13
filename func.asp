@@ -81,3 +81,55 @@ Function get_color(status)
 	End If
 	get_color = color
 End Function
+
+
+
+'產生日期週期的SQL
+'SQL = get_sql("MFG_DAY",MFG_DAY,QTY,"d","l5ab_rework","RW_TYPE","SHT_CNT","RW_TYPE in ('Film RW','PR RW')")
+Function get_sql(PERIOD_FN,MFG_DAY,QTY,PERIOD,TN,GB,SF,CD)
+	SQL = "select " & GB
+	For i = 0 to QTY-1
+		If PERIOD = "w" Then
+			D = DateAdd("ww",i,MFG_DAY)
+		Else
+			D = DateAdd(PERIOD,i,MFG_DAY)
+		End If
+		If PERIOD = "m" Then
+			FN = RIGHT(YEAR(D),2) & RIGHT("0" & MONTH(D),2)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & " >='" & D & "' and " & PERIOD_FN & " <'" & DateAdd("m",1,D) & "' then " & SF & " else 0 end) as 'M" & FN & "'"
+		ElseIf PERIOD = "w" Then
+			FN = Right("0" & DatePart("ww",DateAdd("d",6,D)),2)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & " between '" & D & "' and '" & DateAdd("d",6,D) & "' then " & SF & " else 0 end) as 'W" & FN & "'"
+		Else
+			FN = Mid(D,6)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & "='" & D & "' then " & SF & " else 0 end) as '" & FN & "'"
+		End If
+	Next
+	SQL = SQL & " from l5ab_db." & TN & " where " & PERIOD_FN & " >= '" & MFG_DAY & "'"
+	If CD <> "" Then SQL = SQL & " and " & CD
+	SQL = SQL & " group by " & GB
+	get_sql = SQL
+End Function
+
+'SQL = get_period_sql("CLM_MFDT",MFG_DAY,5,"w","SHT_CNT")
+Function get_period_sql(PERIOD_FN,MFG_DAY,QTY,PERIOD,SF)
+	SQL = ""
+	For i = 0 to QTY-1
+		If PERIOD = "w" Then
+			D = DateAdd("ww",i,MFG_DAY)
+		Else
+			D = DateAdd(PERIOD,i,MFG_DAY)
+		End If
+		If PERIOD = "m" Then
+			FN = RIGHT(YEAR(D),2) & RIGHT("0" & MONTH(D),2)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & " >='" & D & "' and " & PERIOD_FN & " <'" & DateAdd("m",1,D) & "' then " & SF & " else 0 end) as 'M" & FN & "'"
+		ElseIf PERIOD = "w" Then
+			FN = Right("0" & DatePart("ww",DateAdd("d",6,D)),2)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & " between '" & D & "' and '" & DateAdd("d",6,D) & "' then " & SF & " else 0 end) as 'W" & FN & "'"
+		Else
+			FN = Mid(D,6)
+			SQL = SQL & ",sum(case when " & PERIOD_FN & "='" & D & "' then " & SF & " else 0 end) as '" & FN & "'"
+		End If
+	Next
+	get_period_sql = SQL
+End Function
