@@ -133,3 +133,15 @@ Function get_period_sql(PERIOD_FN,MFG_DAY,QTY,PERIOD,SF)
 	Next
 	get_period_sql = SQL
 End Function
+
+
+'PERIOD = get_period(MFG_DAY,"m",8,"INPUT_SHT")
+Function get_period(MFG_DAY,PT,N,SF)
+	PERIOD = ""
+	For i = 0 to N-1
+		M = Year(DateAdd(PT,i,MFG_DAY)) & "-" & Right("0" & Month(DateAdd(PT,i,MFG_DAY)),2)
+		PERIOD = PERIOD & ",sum(case when PERIOD='" & DateAdd(PT,i,MFG_DAY) & "' then " & SF & " else 0 end) as '" & M & "'"
+	Next
+	get_period = PERIOD
+End Function
+
