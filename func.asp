@@ -19,6 +19,97 @@ Sub show_table()
     set rs = nothing
 End Sub
 
+
+'colspan非數值欄位數，colsum=0->不顯示，1->顯示加總，2->顯示GAP
+Sub show_format_table(colspan,colsum,rowsum)
+    set rs=server.createobject("adodb.Recordset")
+    rs.Open SQL,cnn
+	
+	If colspan < 0 Then
+		colspan = rs.Fields.Count-1
+	End If
+	
+	ReDim sub_sum(rs.Fields.Count-1-colspan)
+    Response.Write "<table><tr>"
+    For i = 0 to rs.Fields.Count-1
+        Response.Write "<th>" & rs(i).Name & "</th>"
+    Next
+	If colsum = 1 Then
+		Response.Write "<th>SUM</th>"
+	ElseIf colsum = 2 Then
+		Response.Write "<th>GAP</th>"
+	End If
+    Response.Write "</tr>"
+	If Not rs.EOF Then
+		rs0 = rs(0)
+	End If
+	incolor = "#D0D8E8"
+	bgcolor = incolor
+    While Not rs.EOF	' 判斷是否過了最後一筆
+		If rs0 <> rs(0) Then
+			If bgcolor = incolor Then
+				bgcolor = "#C3D69B"
+			Else
+				bgcolor = incolor
+			End If
+    	Else
+			
+		End If
+		Response.Write "<tr style='background:" & bgcolor & ";'>"
+		
+		TEMP = 0
+		For i = 0 to colspan-1
+			Response.Write "<td><b>" & rs(i) & "</b></td>"
+		Next
+		For i = colspan to rs.Fields.Count-1
+			Response.Write "<td>"
+			If rs(i) <> "0" Then
+				Response.Write FormatNumber(rs(i),0)
+				sub_sum(i-colspan) = sub_sum(i-colspan) + CLNG(rs(i))
+				TEMP = TEMP + CLNG(rs(i))
+			End If
+			Response.Write "</td>"
+    	Next
+		If colsum = 2 Then
+			TEMP = rs(rs.Fields.Count-1) - rs(rs.Fields.Count-2)
+		End If
+		If colsum > 0 Then
+			Response.Write "<td>" & format_number(TEMP) & "</td>"
+		End If
+		Response.Write "</tr>"
+		rs0 = rs(0)
+		rs.MoveNext	' 移到下一筆
+    Wend
+	
+	If rowsum > 0 Then
+	Response.Write "<tr style='background:#cccccc;'>"
+	Response.Write "<td colspan=" & colspan & ">SUM</td>"
+	TEMP = 0
+	For i = 0 to Ubound(sub_sum)
+		Response.Write "<td>" & sub_sum(i) & "</td>"
+		TEMP = TEMP + sub_sum(i)
+	Next
+	If colsum = 2 Then
+		TEMP = sub_sum(Ubound(sub_sum)) - sub_sum(Ubound(sub_sum)-1)
+	End If
+	Response.Write "<td>" & format_number(TEMP) & "</td>"
+	Response.Write "</tr>"
+	End If
+    Response.Write "</table>"
+    rs.Close
+    set rs = nothing
+End Sub
+
+Function format_number(n)
+	If n < 0 Then
+		format_number = "<font color=blue>" & FormatNumber(n,0) & "</font>"
+	Else
+		format_number = "<font color=black>" & FormatNumber(n,0) & "</font>"
+	End If
+End Function
+
+
+
 '轉日期時間格式
 Function FDT(DT)
 	FDT = FormatDateTime(DT,vbShortDate) & " " & FormatDateTime(DT,vbShortTime) & ":" & right("0" & Second(DT),2)
