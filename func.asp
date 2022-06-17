@@ -19,6 +19,74 @@ Sub show_table()
     set rs = nothing
 End Sub
 
+#取得JSON格式，orient=["records","split"]
+Function get_json(SQL,orient)
+    set rs=server.createobject("adodb.Recordset")
+    rs.Open SQL,cnn
+	
+	If orient = "split" Then
+		json = "{""columns"":[""" & rs(0).Name & """"
+		For rs_i = 1 to rs.Fields.Count-1
+			json = json & ",""" & rs(rs_i).Name & """"
+		Next
+		json = json & "]"
+		rs_c = 0
+		While Not rs.EOF	' 判斷是否過了最後一筆
+			if rs_c = 0 Then
+				json = json & ",""data"":["
+			Else
+				json = json & ","
+			End If
+			json = json & "["
+			For rs_i = 0 to rs.Fields.Count-1
+				If rs_i > 0 Then json =json & ","
+				t = rs(rs_i)
+				If t <> "" Then
+					t = Replace(t,vbCrLf,"\n")
+					t = Replace(t,"""","\""")
+				End If
+				If rs(rs_i).Type <= 20 Then
+					json = json & t
+				Else
+					json = json & """" & t & """"
+				End If
+			Next
+			json = json & "]"
+			rs_c = rs_c + 1
+			rs.MoveNext	' 移到下一筆
+		Wend
+		json = json & "]"
+		json = json & "}"
+	Else
+		json = "["
+		While Not rs.EOF	' 判斷是否過了最後一筆
+			If json <> "[" Then json = json & ","
+			json = json & "{"
+			For rs_i = 0 to rs.Fields.Count-1
+				If rs_i > 0 Then json =json & ","
+				t = rs(rs_i)
+				If t <> "" Then
+					t = Replace(t,vbCrLf,"\n")
+					t = Replace(t,"""","\""")
+				End If
+				json = json & """" & rs(rs_i).Name & """:"
+				If rs(rs_i).Type <= 20 Then
+					json = json & t
+				Else
+					json = json & """" & t & """"
+				End If
+			Next
+			json = json & "}"
+		rs.MoveNext	' 移到下一筆
+		Wend
+		json = json & "]"
+	End If
+	
+    rs.Close
+    set rs = nothing
+	get_json = json
+End Function
+
 
 'colspan非數值欄位數，colsum=0->不顯示，1->顯示加總，2->顯示GAP
 Sub show_format_table(colspan,colsum,rowsum)
